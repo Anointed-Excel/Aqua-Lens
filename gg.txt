@@ -1,0 +1,182 @@
+
+❯ Onboarding screen — a simple welcome/intro screen for first-time users (looks              
+  professional for a demo). with what the app is about  Better empty states — when history   
+is empty, explore is empty etc. already has some but                                         
+  could be richer.6. Dark/Light theme toggle on the profile screen (theme context is already 
+ set up).                                                                                    
+  7. Export history as PDF/CSV — for a final year project, showing data export capability is 
+  impressive.                                                                                
+  8. Fish map — show a map of where fish were caught (location is already stored in scan     
+  history). tho i think we have the toggle in the user profile page                          
+
+● Let me read the current state of the relevant files first before touching anything:
+
+● Read 2 files (ctrl+o to expand)
+
+● Good — theme toggle already exists in Profile. Let me check what packages are available and
+   the ExploreScreen empty state:
+
+● Read 3 files (ctrl+o to expand)
+
+● Good. Theme toggle already exists — confirmed. Now let me check SplashScreen to understand
+  the auth flow before adding onboarding:
+
+● Read 1 file (ctrl+o to expand)
+
+● Perfect picture. I'll now implement all 4 features in one go. Let me install the needed
+  packages first:
+
+● Bash(cd "/home/anointed/Desktop/Fish App/FishApp" && npx expo install react-native-maps
+      expo-sharing 2>&1 | tail -10)
+  ⎿  env: export EXPO_PUBLIC_API_URL
+     › Installing 2 SDK 54.0.0 compatible native modules using npm
+     > npm install
+     … +7 lines (ctrl+o to expand)
+  ⎿  (timeout 1m)
+
+● Good. Now I'll build all 4 features in one push. Let me write them all:
+
+● Now writing all 4 features:
+
+● Write(src/screens/OnboardingScreen.js)
+  ⎿  Wrote 217 lines to src/screens/OnboardingScreen.js
+       1 import React, { useRef, useState } from 'react';
+       2 import {
+       3   View, Text, FlatList, StyleSheet, TouchableOpacity,
+       4   Dimensions, StatusBar,
+       5 } from 'react-native';
+       6 import Animated, {
+       7   useSharedValue, useAnimatedStyle, withSpring,
+       8 } from 'react-native-reanimated';
+       9 import { Feather } from '@expo/vector-icons';
+      10 import AsyncStorage from '@react-native-async-storage/async-storage';
+     … +207 lines (ctrl+o to expand)
+
+❯ in the empty state make sure u use consiten icons with the app,                            
+
+● Write(src/screens/MapScreen.js)
+  ⎿  Wrote 230 lines to src/screens/MapScreen.js
+       1 import React, { useEffect, useState } from 'react';
+       2 import {
+       3   View, Text, StyleSheet, ActivityIndicator,
+       4   StatusBar, TouchableOpacity, FlatList, Image,
+       5 } from 'react-native';
+       6 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
+       7 import * as Location from 'expo-location';
+       8 import { Feather } from '@expo/vector-icons';
+       9 import { useTheme } from '../context/ThemeContext';
+      10 import { getHistory } from '../services/api';
+     … +220 lines (ctrl+o to expand)
+
+● Now update SplashScreen to check onboarding, update HistoryScreen with export + better
+  empty state, ExploreScreen with better empty state, HomeScreen with GPS, and AppNavigator:
+
+● Update(src/screens/SplashScreen.js)
+  ⎿  Added 1 line
+       4    useSharedValue, useAnimatedStyle,
+       5    withTiming, withSpring, withDelay, withRepeat, withSequence, Easing,
+       6  } from 'react-native-reanimated';
+       7 +import AsyncStorage from '@react-native-async-storage/async-storage';       
+       8  import { isLoggedIn } from '../utils/storage';
+       9  
+      10  const { width } = Dimensions.get('window');
+
+● Update(src/screens/SplashScreen.js)
+  ⎿  Added 6 lines, removed 2 lines
+      50  
+      51      // Navigate
+      52      const t = setTimeout(async () => {
+      53 -      const ok = await isLoggedIn();                                        
+      54 -      navigation.replace(ok ? 'Main' : 'Login');                            
+      53 +      const [ok, seen] = await Promise.all([isLoggedIn(), AsyncStorage.getIt
+         +em('onboarding_done')]);                                                    
+      54 +      if (!seen) {                                                          
+      55 +        navigation.replace('Onboarding');                                   
+      56 +      } else {                                                              
+      57 +        navigation.replace(ok ? 'Main' : 'Login');                          
+      58 +      }                                                                     
+      59      }, 2600);
+      60      return () => clearTimeout(t);
+      61    }, []);
+
+● Now update AppNavigator to include Onboarding and MapScreen:
+
+● Update(src/navigation/AppNavigator.js)
+  ⎿  Added 2 lines
+       7  import { useTheme } from '../context/ThemeContext';
+       8  
+       9  import SplashScreen         from '../screens/SplashScreen';
+      10 +import OnboardingScreen     from '../screens/OnboardingScreen';             
+      11  import LoginScreen          from '../screens/LoginScreen';
+      12  import RegisterScreen       from '../screens/RegisterScreen';
+      13  import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+     ...
+      19  import ExploreScreen        from '../screens/ExploreScreen';
+      20  import HistoryScreen        from '../screens/HistoryScreen';
+      21  import ProfileScreen        from '../screens/ProfileScreen';
+      22 +import MapScreen            from '../screens/MapScreen';                    
+      23  
+      24  const Stack = createStackNavigator();
+      25  const Tab   = createBottomTabNavigator();
+
+● Update(src/navigation/AppNavigator.js)
+  ⎿  Added 2 lines
+      154      <NavigationContainer>
+      155        <Stack.Navigator screenOptions={{ headerShown: false }}>
+      156          <Stack.Screen name="Splash"         component={SplashScreen} />
+      157 +        <Stack.Screen name="Onboarding"     component={OnboardingScreen} />
+      158          <Stack.Screen name="Login"          component={LoginScreen} />
+      159          <Stack.Screen name="Register"       component={RegisterScreen} />
+      160          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen
+           } />
+      161          <Stack.Screen name="VerifyOTP"      component={VerifyOTPScreen} />
+      162          <Stack.Screen name="Main"           component={MainTabs} />
+      163 +        <Stack.Screen name="Map"            component={MapScreen} />       
+      164        </Stack.Navigator>
+      165      </NavigationContainer>
+      166    );
+
+● Now update HistoryScreen — richer empty state (Feather icons, consistent), map button, and
+  CSV export:
+
+● Update(src/screens/HistoryScreen.js)
+  ⎿  Added 2 lines
+       5  } from 'react-native';       
+       6  import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay }
+           from 'react-native-reanimated';                                                   
+       7  import { Feather } from '@expo/vector-icons';
+       8 +import * as FileSystem from 'expo-file-system';                                    
+       9 +import * as Sharing from 'expo-sharing';                                         
+      10  import { useTheme } from '../context/ThemeContext';
+      11  import { getHistory, deleteScan } from '../services/api';
+      12  
+
+● Update(src/screens/HistoryScreen.js) 
+
+─────────────────────────────────────────────────────────────────────────────────────────────
+ Edit file
+ src/screens/HistoryScreen.js                                                                
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+ 74                                                                                          
+ 75  export default function HistoryScreen({ navigation }) {                               
+ 76    const { theme: t } = useTheme();
+ 77 -  const [history, setHistory]       = useState([]);                                     
+ 78 -  const [loading, setLoading]       = useState(true);                                   
+ 79 -  const [refreshing, setRefreshing] = useState(false);                                  
+ 77 +  const [history, setHistory]         = useState([]);                                   
+ 78 +  const [loading, setLoading]         = useState(true);                                 
+ 79 +  const [refreshing, setRefreshing]   = useState(false);                                
+ 80    const [loadingMore, setLoadingMore] = useState(false);
+ 81 -  const [page, setPage]             = useState(1);                                      
+ 82 -  const [totalPages, setTotalPages] = useState(1);                                      
+ 81 +  const [exporting, setExporting]     = useState(false);                                
+ 82 +  const [page, setPage]               = useState(1);                                    
+ 83 +  const [totalPages, setTotalPages]   = useState(1);                                    
+ 84  
+ 85    const load = useCallback(async (reset = false) => {
+ 86      const pg = reset ? 1 : page;
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+ Do you want to make this edit to HistoryScreen.js?
+ ❯ 1. Yes
+   2. Yes, allow all edits during this session (shift+tab)
+   3. No
