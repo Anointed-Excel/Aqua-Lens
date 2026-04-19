@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Set EXPO_PUBLIC_API_URL in your .env file or EAS build environment
-export const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://your-fish-api.onrender.com';
+export const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://aqua-lens.onrender.com';
 
 const api = axios.create({
   baseURL: BASE_URL,
