@@ -33,8 +33,8 @@ class FishSpecies(db.Model):
     average_size = db.Column(db.String(80))
     max_size = db.Column(db.String(80))
     weight_range = db.Column(db.String(80))
-    danger_level = db.Column(db.String(50))   # Safe, Mildly Dangerous, Dangerous, Toxic
-    edible = db.Column(db.String(20))          # Yes, No, Caution
+    danger_level = db.Column(db.String(100))   # Safe, Mildly Dangerous, Dangerous, Toxic
+    edible = db.Column(db.String(100))          # Yes, No, Caution
     conservation_status = db.Column(db.String(80))
     characteristics = db.Column(db.Text)
     description = db.Column(db.Text)
@@ -86,7 +86,7 @@ class CustomFish(db.Model):
     name = db.Column(db.String(100), nullable=False)
     scientific_name = db.Column(db.String(150))
     characteristics = db.Column(db.Text)
-    edible = db.Column(db.String(20))
+    edible = db.Column(db.String(100))
     habitat = db.Column(db.Text)
     diet = db.Column(db.Text)
     average_size = db.Column(db.String(80))
