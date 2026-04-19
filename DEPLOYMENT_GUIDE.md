@@ -54,9 +54,9 @@ Go to your web service → **Environment** tab → add ALL of these one by one:
 | `JWT_SECRET_KEY` | `aqualens-super-secret-jwt-key-2024` |
 | `VISION_AI_PROVIDER` | `openai` |
 | `OPENAI_API_KEY` | `YOUR_OPENAI_API_KEY` |
-| `CLOUDINARY_CLOUD_NAME` | `dmplqdcgw` |
-| `CLOUDINARY_API_KEY` | `179935235522448` |
-| `CLOUDINARY_API_SECRET` | `ujrztuR-XrB17j7kBeQ5inQkuQM` |
+| `CLOUDINARY_CLOUD_NAME` | `YOUR_CLOUDINARY_CLOUD_NAME` |
+| `CLOUDINARY_API_KEY` | `YOUR_CLOUDINARY_API_KEY` |
+| `CLOUDINARY_API_SECRET` | `YOUR_CLOUDINARY_API_SECRET` |
 
 > **Note:** Gemini keys are no longer used. Vision AI is now powered by OpenAI GPT-5.4-mini.
 

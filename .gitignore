@@ -40,3 +40,4 @@ expo-env.d.ts
 # Misc
 *.tsbuildinfo
 .metro-health-check*
+render_env_vars.txt
